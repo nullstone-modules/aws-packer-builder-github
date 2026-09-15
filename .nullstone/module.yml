@@ -1,0 +1,18 @@
+org_name: nullstone
+name: aws-packer-build
+friendly_name: Packer Build (AWS)
+description: |
+  IAM role and GitHub OIDC trust so GitHub Actions can bake AMIs with Packer in this AWS account.
+  Outputs the role ARN, region, AMI copy regions, and org launch ARNs for the bake workflow to consume.
+category: cluster
+subcategory: ""
+provider_types:
+  - aws
+platform: packer
+subplatform: github
+type: ""
+appCategories: []
+is_public: true
+tool_name: opentofu
+include: []
+source_url: https://github.com/nullstone-modules/aws-packer-build
