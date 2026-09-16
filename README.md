@@ -57,11 +57,11 @@ The bake workflow reads the role and bake region from this workspace. Copy regio
 
 ```yaml
 env:
-  NULLSTONE_ORG: ${{ vars.NULLSTONE_ORG || 'nullstone' }}
+  NULLSTONE_ORG: ${{ vars.NULLSTONE_ORG }}
   NULLSTONE_API_KEY: ${{ secrets.NULLSTONE_API_KEY }}
-  NULLSTONE_STACK: ${{ vars.NULLSTONE_STACK || 'internal' }}
-  NULLSTONE_BLOCK: ${{ vars.NULLSTONE_BLOCK || 'aws-packer-builder' }}
-  NULLSTONE_ENV: ${{ vars.NULLSTONE_ENV || 'local' }}
+  NULLSTONE_STACK: ${{ vars.NULLSTONE_STACK }}
+  NULLSTONE_BLOCK: ${{ vars.NULLSTONE_BLOCK }}
+  NULLSTONE_ENV: ${{ vars.NULLSTONE_ENV }}
 
 steps:
   - uses: nullstone-io/setup-nullstone-action@v0
