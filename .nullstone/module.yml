@@ -1,10 +1,11 @@
 org_name: nullstone
-name: aws-packer-build
-friendly_name: Packer Build (AWS)
+name: aws-packer-builder-github
+friendly_name: Packer Builder (AWS via GitHub)
 description: |
-  IAM role and GitHub OIDC trust so GitHub Actions can bake AMIs with Packer in this AWS account.
+  Configures an AWS account to perform packer builds.
+  This creates an IAM role and GitHub OIDC trust so GitHub Actions can bake AMIs with Packer in an AWS account.
   Outputs the role ARN, region, AMI copy regions, and org launch ARNs for the bake workflow to consume.
-category: cluster
+category: block
 subcategory: ""
 provider_types:
   - aws
