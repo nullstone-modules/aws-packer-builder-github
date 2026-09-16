@@ -25,29 +25,3 @@ Leave empty to create one. An account can have only one provider for that URL; i
 with EntityAlreadyExists, set this to the existing ARN.
 EOF
 }
-
-variable "ami_regions" {
-  type        = list(string)
-  default     = []
-  description = <<EOF
-Regions Packer should copy the finished AMI into, besides the bake region.
-Exposed as an output so the GitHub bake workflow does not need an AMI_REGIONS repo variable.
-EOF
-}
-
-variable "ami_org_arns" {
-  type        = list(string)
-  default     = []
-  description = <<EOF
-Organization ARNs granted AMI launch permission at bake time (`arn:aws:organizations::ACCOUNT:organization/o-...`).
-Exposed as an output so the GitHub bake workflow does not need an AMI_ORG_ARNS repo variable.
-Does not make the AMI public.
-EOF
-
-  validation {
-    condition = alltrue([
-      for a in var.ami_org_arns : can(regex("^arn:aws:organizations::[0-9]{12}:organization/o-[a-z0-9]+$", a))
-    ])
-    error_message = "Each ami_org_arns entry must be an organization ARN."
-  }
-}
