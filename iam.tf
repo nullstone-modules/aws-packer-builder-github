@@ -85,6 +85,7 @@ data "aws_iam_policy_document" "packer" {
       "ec2:DescribeSecurityGroups",
       "ec2:DescribeSnapshots",
       "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs",
       "ec2:DescribeTags",
       "ec2:DescribeVolumes",
       "ec2:DetachVolume",

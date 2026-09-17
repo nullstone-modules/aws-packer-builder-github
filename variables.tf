@@ -17,6 +17,17 @@ EOF
   }
 }
 
+variable "vpc_cidr" {
+  type        = string
+  default     = "10.255.0.0/24"
+  description = "CIDR for the Packer VPC and its single public subnet."
+
+  validation {
+    condition     = can(cidrhost(var.vpc_cidr, 0))
+    error_message = "vpc_cidr must be a valid IPv4 CIDR."
+  }
+}
+
 variable "github_oidc_provider_arn" {
   type        = string
   default     = ""

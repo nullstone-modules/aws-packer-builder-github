@@ -7,7 +7,7 @@
 
 Creates the AWS IAM role GitHub Actions assumes (OIDC, not access keys) to bake AMIs with Packer in this account.
 
-It also creates the GitHub OIDC provider if this account does not already have one. Outputs are the role ARN, workspace region, and account ID. Copy regions and org launch ARNs stay on each Packer build, not on this module.
+It also creates a one-subnet public VPC (Internet gateway, no NAT) for the Packer builder instance, and the GitHub OIDC provider if this account does not already have one. Outputs are the role ARN, workspace region, account ID, VPC, and subnet. Copy regions and org launch ARNs stay on each Packer build, not on this module.
 
 ---
 
@@ -25,6 +25,7 @@ Create this block once per AMI-owning account. Other Packer AMIs in the same acc
 | --- | --- | --- | --- |
 | `github_repositories` | list(string) | (required) | Repositories allowed to assume the role, each `owner/name`. |
 | `github_oidc_provider_arn` | string | `""` | Existing GitHub OIDC provider ARN. Leave empty to create one. |
+| `vpc_cidr` | string | `10.255.0.0/24` | CIDR for the Packer VPC and its single public subnet. |
 
 ---
 
@@ -35,6 +36,8 @@ Create this block once per AMI-owning account. Other Packer AMIs in the same acc
 | `role_arn` | IAM role GitHub Actions assumes through OIDC. |
 | `aws_region` | Region of this workspace. Bake here. |
 | `aws_account_id` | Account that owns the AMIs. Other accounts set `ami_owner` to this. |
+| `vpc_id` | Packer builder VPC. |
+| `subnet_id` | Public subnet for the Packer builder. Pass to amazon-ebs `subnet_id`. |
 
 ---
 
@@ -53,7 +56,7 @@ blocks:
 
 If this account already has a GitHub OIDC provider, set `github_oidc_provider_arn` to that ARN. AWS allows only one provider per URL.
 
-The bake workflow reads the role and bake region from this workspace. Copy regions stay on the image repo (`AMI_REGIONS` or Packer `-var ami_regions=`).
+The bake workflow reads the role, bake region, and subnet from this workspace. Copy regions stay on the image repo (`AMI_REGIONS` or Packer `-var ami_regions=`).
 
 ```yaml
 env:
@@ -69,6 +72,7 @@ steps:
     run: |
       echo "role_arn=$(nullstone outputs --field=role_arn)" >> "$GITHUB_OUTPUT"
       echo "aws_region=$(nullstone outputs --field=aws_region)" >> "$GITHUB_OUTPUT"
+      echo "subnet_id=$(nullstone outputs --field=subnet_id)" >> "$GITHUB_OUTPUT"
   - uses: aws-actions/configure-aws-credentials@v4
     with:
       role-to-assume: ${{ steps.packer.outputs.role_arn }}
@@ -89,6 +93,6 @@ The identity policy is Packer's amazon-ebs set, plus `ec2:CopyImage` and `ec2:Mo
 
 ## Limitations
 
-This module does not run Packer. It only creates the role. The AMI lookup tag (`Name = nullstone-vault` for Vault) stays in the image repo.
+This module does not run Packer. It creates the role and the bake VPC. The AMI lookup tag (`Name = nullstone-vault` for Vault) stays in the image repo.
 
 Creating a second GitHub OIDC provider in the same account fails. Set `github_oidc_provider_arn` when one already exists.

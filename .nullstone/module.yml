@@ -3,8 +3,9 @@ name: aws-packer-builder-github
 friendly_name: Packer Builder (AWS via GitHub)
 description: |
   Configures an AWS account to perform packer builds.
-  This creates an IAM role and GitHub OIDC trust so GitHub Actions can bake AMIs with Packer in an AWS account.
-  Outputs the Packer role ARN and workspace region. Copy regions and org launch ARNs stay on each Packer build.
+  This creates an IAM role and GitHub OIDC trust so GitHub Actions can bake AMIs with Packer in an AWS account,
+  plus a one-subnet public VPC for the builder instance.
+  Outputs the Packer role ARN, workspace region, and subnet. Copy regions and org launch ARNs stay on each Packer build.
 category: block
 subcategory: ""
 provider_types:
