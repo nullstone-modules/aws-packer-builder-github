@@ -81,7 +81,7 @@ GitHub still needs `NULLSTONE_API_KEY`. It does not need `AWS_ROLE_ARN`. `AMI_RE
 
 ## Trust and permissions
 
-The role trust is GitHub OIDC only. `sub` is `repo:<owner>/<name>:*` for each listed repository, so a `workflow_dispatch` from a branch can bake. Access keys are not created.
+The role trust is GitHub OIDC only. For each listed repository it matches both `repo:<owner>/<name>:*` (legacy subject) and `repo:<owner>@*/<name>@*:*` (immutable subject, default for repos created after 2026-07-15). A `workflow_dispatch` from a branch can bake. Access keys are not created.
 
 The identity policy is Packer's amazon-ebs set, plus `ec2:CopyImage` and `ec2:ModifyImageAttribute` so a bake can copy regions and grant org launch permission. Which regions and orgs is each image's Packer config.
 

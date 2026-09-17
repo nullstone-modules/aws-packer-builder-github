@@ -2,7 +2,8 @@ variable "github_repositories" {
   type        = list(string)
   description = <<EOF
 GitHub repositories allowed to assume the Packer role, each as `owner/name`.
-The trust policy matches `repo:<owner>/<name>:*` so workflow_dispatch and branch pushes both work.
+The trust policy matches both `repo:<owner>/<name>:*` (legacy OIDC subject) and
+`repo:<owner>@*/<name>@*:*` (immutable subject used by repos created after 2026-07-15).
 EOF
 
   validation {

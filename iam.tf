@@ -2,7 +2,14 @@ locals {
   github_oidc_url          = "https://token.actions.githubusercontent.com"
   create_github_oidc       = var.github_oidc_provider_arn == ""
   github_oidc_provider_arn = local.create_github_oidc ? aws_iam_openid_connect_provider.github[0].arn : var.github_oidc_provider_arn
-  github_oidc_subs         = [for r in var.github_repositories : "repo:${r}:*"]
+  # Repos created after 2026-07-15 emit repo:owner@ORG_ID/name@REPO_ID:...
+  # Older repos still emit repo:owner/name:.... Trust both.
+  github_oidc_subs = flatten([
+    for r in var.github_repositories : [
+      "repo:${r}:*",
+      "repo:${split("/", r)[0]}@*/${split("/", r)[1]}@*:*",
+    ]
+  ])
 }
 
 data "tls_certificate" "github" {
