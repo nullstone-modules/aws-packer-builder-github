@@ -95,6 +95,49 @@ run "packer_vpc_is_one_public_subnet" {
   }
 }
 
+run "network_resources_carry_name_tags" {
+  command = plan
+
+  override_data {
+    target = data.aws_availability_zones.available
+    values = {
+      names = ["us-east-1a"]
+    }
+  }
+
+  override_resource {
+    target = random_string.resource_suffix
+    values = {
+      result = "abcde"
+    }
+  }
+
+  assert {
+    condition     = aws_vpc.packer.tags["Name"] == "${data.ns_workspace.this.block_ref}-abcde"
+    error_message = "VPC Name tag must be the workspace resource name"
+  }
+
+  assert {
+    condition     = aws_internet_gateway.packer.tags["Name"] == aws_vpc.packer.tags["Name"]
+    error_message = "IGW Name tag must match the VPC"
+  }
+
+  assert {
+    condition     = aws_subnet.packer.tags["Name"] == "${aws_vpc.packer.tags["Name"]}-public"
+    error_message = "subnet Name tag must be <vpc>-public"
+  }
+
+  assert {
+    condition     = aws_route_table.packer.tags["Name"] == "${aws_vpc.packer.tags["Name"]}-public"
+    error_message = "route table Name tag must be <vpc>-public"
+  }
+
+  assert {
+    condition     = alltrue([for k, v in data.ns_workspace.this.aws_tags : aws_vpc.packer.tags[k] == v])
+    error_message = "VPC must keep the workspace tags alongside Name"
+  }
+}
+
 run "custom_cidr_applies_to_vpc_and_subnet" {
   command = plan
 

@@ -7,17 +7,21 @@ data "aws_availability_zones" "available" {
   }
 }
 
+locals {
+  vpc_name = local.resource_name
+}
+
 # One public subnet. Packer SSH from GitHub needs an Internet gateway, not NAT.
 resource "aws_vpc" "packer" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags                 = local.tags
+  tags                 = merge(local.tags, { "Name" = local.vpc_name })
 }
 
 resource "aws_internet_gateway" "packer" {
   vpc_id = aws_vpc.packer.id
-  tags   = local.tags
+  tags   = merge(local.tags, { "Name" = local.vpc_name })
 }
 
 resource "aws_subnet" "packer" {
@@ -25,12 +29,12 @@ resource "aws_subnet" "packer" {
   cidr_block              = var.vpc_cidr
   availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = true
-  tags                    = local.tags
+  tags                    = merge(local.tags, { "Name" = "${local.vpc_name}-public" })
 }
 
 resource "aws_route_table" "packer" {
   vpc_id = aws_vpc.packer.id
-  tags   = local.tags
+  tags   = merge(local.tags, { "Name" = "${local.vpc_name}-public" })
 }
 
 resource "aws_route" "packer_internet" {
